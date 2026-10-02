@@ -132,11 +132,13 @@
   }
 
   const header = [
-    `### Copied for Claude · ${site} ${kind}${count > 1 ? ` · ${count} items` : ""} · ${new Date().toLocaleDateString("en-GB")}`,
+    `### ${window.__c4cSilent ? "" : "Copied for Claude · "}${site} ${kind}${count > 1 ? ` · ${count} items` : ""} · ${new Date().toLocaleDateString("en-GB")}`,
     `Page: ${location.href}`,
     "",
   ];
   const text = header.concat(body).join("\n");
+  window.__copyForClaude = text;
+  if (window.__c4cSilent) return; // the desktop extension reads the text itself: no panel, no clipboard
 
   /* Show a small panel: auto-copy when the browser allows it, otherwise a Copy button. */
   const old = document.getElementById("c4c-panel");
@@ -176,5 +178,4 @@
   panel.append(msg, ta, row);
   document.body.appendChild(panel);
   copy();
-  window.__copyForClaude = text;
 })();

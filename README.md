@@ -1,5 +1,37 @@
 # Ai-assist: eBay + Etsy shopping for Claude (UK)
 
+## Recommended: the Claude Desktop extension (automatic, no API keys)
+
+[`ebay-etsy-shopper.mcpb`](ebay-etsy-shopper.mcpb) is a one-click extension
+for the **Claude Desktop app** (Mac or Windows). Ask Claude about eBay or
+Etsy, and it opens the pages itself in Google Chrome (or Microsoft Edge) on
+your computer, reads them and answers. There's no copy-paste and no keys.
+Because it browses from your own computer and connection, eBay and Etsy
+treat it like you browsing.
+
+**Install**
+1. Have the Claude Desktop app and Google Chrome (or Edge, which comes with
+   Windows) installed.
+2. Double-click `ebay-etsy-shopper.mcpb`, or in Claude Desktop go to
+   **Settings → Extensions** and drag the file in. Click **Install**.
+
+**Use.** Just ask, for example: "Find a used Switch OLED under £200 with
+free postage and compare the sellers", or "What do Pyrex 401 bowls actually
+sell for?". A Chrome window opens while Claude looks. If a site asks you to
+confirm you're human, do it in that window and ask again. It usually only
+asks once.
+
+It's read-only: it never buys, bids or messages anyone. It doesn't work in
+the phone app. On a phone, use the button below.
+
+Source: `desktop-extension/`. Rebuild with `npm install && npm run pack`.
+Test with `npm test` (it drives a real Chromium against sample pages over
+MCP).
+
+---
+
+## On your phone: Copy for Claude button + skill
+
 Two parts that work together, with no API keys:
 
 1. **Copy for Claude**: a bookmark button for your browser. On any eBay or

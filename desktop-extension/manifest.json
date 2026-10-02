@@ -1,0 +1,40 @@
+{
+  "manifest_version": "0.2",
+  "name": "ebay-etsy-shopper",
+  "display_name": "eBay + Etsy Shopper (UK)",
+  "version": "1.0.0",
+  "description": "Lets Claude search and read eBay UK and Etsy UK in a Chrome window on your computer. No API keys.",
+  "long_description": "When you ask Claude about something on eBay or Etsy, it opens the pages in Google Chrome (or Microsoft Edge) on your own computer, reads the listings and answers: comparisons, sold prices, postage, seller feedback, returns. Because it uses your own browser and internet connection, eBay and Etsy treat it like you browsing. It is read-only: it never buys, bids or messages anyone. If a site asks you to confirm you're human, complete it in the window that opened and ask again.",
+  "author": { "name": "stanandrandymarsh-1554" },
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "SHOPPER_HEADLESS": "${user_config.hide_browser}"
+      }
+    }
+  },
+  "tools": [
+    { "name": "ebay_search", "description": "Search eBay UK, including sold prices" },
+    { "name": "etsy_search", "description": "Search Etsy UK" },
+    { "name": "open_page", "description": "Read an eBay or Etsy listing, shop or search page" }
+  ],
+  "user_config": {
+    "hide_browser": {
+      "type": "boolean",
+      "title": "Hide the browser window",
+      "description": "Run Chrome invisibly. Leave this off if eBay or Etsy ask you to confirm you're human, because you need the window to do that.",
+      "default": false,
+      "required": false
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "node": ">=18.0.0" }
+  },
+  "keywords": ["ebay", "etsy", "shopping", "uk"],
+  "license": "MIT"
+}
