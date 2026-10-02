@@ -1,4 +1,51 @@
-# marketplace-mcp
+# Ai-assist: eBay + Etsy shopping for Claude
+
+## Easiest: the Claude Skill (no API keys)
+
+`ebay-etsy-shopping.zip` is a **Claude Skill**. You upload it to claude.ai
+once, and Claude can then search eBay and Etsy for you in any chat, including
+on your phone.
+
+**Install (one time)**
+1. Download [`ebay-etsy-shopping.zip`](ebay-etsy-shopping.zip).
+2. In claude.ai, go to **Settings → Capabilities**. Make sure **Code execution
+   and file creation** is on.
+3. Go to **Customize → Skills** (on some layouts it's under Settings →
+   Capabilities), choose **Upload skill**, pick the zip, and toggle it on.
+   Uploading skills requires a paid plan (Pro, Max, Team or Enterprise).
+4. Recommended: turn on **Allow network egress** and add `ebay.com` and
+   `etsy.com` to the allowed domains (or choose *All domains*). This lets the
+   skill read search results directly. Without it, Claude falls back to its
+   built-in web search, which still works but gives less detail.
+
+**Use it.** Just ask, for example:
+
+- "Find a used Switch OLED on eBay under $220 with free shipping."
+- "What do Pyrex 401 bowls actually sell for on eBay?" (uses sold listings)
+- "Find a personalized leather dog collar on Etsy from a highly rated shop."
+- "Is this a good deal? https://www.ebay.com/itm/…"
+
+**What to expect**
+- **eBay** usually works directly once network egress is on.
+- **Etsy** blocks most automated requests with a bot-check, so Claude often
+  has to use its web search instead. Results are thinner, and you'll always
+  get a filtered Etsy search link you can open yourself.
+- If you'd like Claude to browse Etsy fully, the *Claude in Chrome* extension
+  (paid plans) lets it use your own browser.
+- It's read-only. Claude gives you links, and you buy, bid or message
+  sellers yourself.
+
+To change the skill, edit the files in `skill/ebay-etsy-shopping/`, run
+`sh skill/build.sh` to rebuild the zip, and upload it again. Run the tests
+with `pytest skill/tests`.
+
+---
+
+## Alternative: MCP server (needs free API keys)
+
+This is a local server for Claude Desktop or Claude Code. It uses eBay's and
+Etsy's official APIs, so it's more reliable, especially for Etsy, but you
+need to create developer keys first. Setup is below.
 
 Lets an AI assistant (Claude Desktop, Claude Code, or any app that supports
 [MCP](https://modelcontextprotocol.io)) search and browse **eBay** and **Etsy**
@@ -133,5 +180,5 @@ authentication if you expose it.
 
 ```bash
 pip install -e '.[dev]'
-pytest
+pytest tests
 ```
