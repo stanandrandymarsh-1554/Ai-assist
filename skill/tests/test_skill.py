@@ -22,13 +22,13 @@ S_ITEM = """
 <li class="s-item s-item__pl-on-bottom"><a href="https://ebay.com/itm/123456">Shop on eBay</a></li>
 <li class="s-item s-item__pl-on-bottom" data-viewport="x">
  <div class="s-item__image"><img src="a.jpg" alt="Nintendo Switch OLED White"></div>
- <a class="s-item__link" href="https://www.ebay.com/itm/Nintendo-Switch-OLED/335512345678?hash=item1&amp;x=1">
+ <a class="s-item__link" href="https://www.ebay.co.uk/itm/Nintendo-Switch-OLED/335512345678?hash=item1&amp;x=1">
   <div class="s-item__title"><span role="heading"><span class="LIGHT_HIGHLIGHT">New Listing</span>Nintendo Switch OLED White</span>
   <span class="clipped">Opens in a new window or tab</span></div></a>
  <div class="s-item__subtitle"><span class="SECONDARY_INFO">Pre-Owned</span></div>
- <span class="s-item__price">$229.99</span>
- <span class="s-item__shipping s-item__logisticsCost">+$12.50 shipping</span>
- <span class="s-item__location s-item__itemLocation">from United States</span>
+ <span class="s-item__price">£229.99</span>
+ <span class="s-item__shipping s-item__logisticsCost">+£3.99 postage</span>
+ <span class="s-item__location s-item__itemLocation">from United Kingdom</span>
  <span class="s-item__seller-info-text">gamerguy (2,345) 99.7%</span>
  <span class="s-item__bids s-item__bidCount">3 bids</span>
  <span class="s-item__time-left">2d 4h left</span>
@@ -36,9 +36,9 @@ S_ITEM = """
 </li>
 <li class="s-item"><div class="s-item__title"><span>Switch OLED Neon</span></div>
  <a href="https://www.ebay.com/itm/335599999999"></a>
- <span class="s-item__caption--signal POSITIVE">Sold  Sep 28, 2026</span>
- <span class="s-item__price"><span class="POSITIVE">$210.00</span></span>
- <span class="s-item__shipping">Free shipping</span>
+ <span class="s-item__caption--signal POSITIVE">Sold  28 Sep 2026</span>
+ <span class="s-item__price"><span class="POSITIVE">£210.00</span></span>
+ <span class="s-item__shipping">Free postage</span>
  <span class="s-item__free-returns">Free returns</span>
 </li></ul>
 <h1 class="srp-controls__count-heading"><span class="BOLD">1,234</span> results for nintendo switch</h1>
@@ -67,7 +67,7 @@ ITEM_PAGE = """
 "brand":{"@type":"Brand","name":"Nintendo"},"gtin13":"0045496883386","image":["https://i.ebayimg.com/1.jpg"],
 "offers":{"@type":"Offer","price":"229.99","priceCurrency":"USD","itemCondition":"https://schema.org/UsedCondition","availability":"https://schema.org/InStock"}}</script></head>
 <body><h1 class="x-item-title__mainTitle"><span class="ux-textspans ux-textspans--BOLD">Nintendo Switch OLED White w/ Dock</span></h1>
-<div class="x-price-primary"><span class="ux-textspans">US $229.99</span></div>
+<div class="x-price-primary"><span class="ux-textspans">US £229.99</span></div>
 <div class="x-sellercard-atf__info"><span>gamerguy</span><span>(2345)</span><span>99.7% positive</span></div>
 <div class="ux-layout-section-evo">
  <dl class="ux-labels-values"><dt class="ux-labels-values__labels"><div class="ux-labels-values__labels-content"><span>Condition:</span></div></dt>
@@ -95,25 +95,25 @@ ETSY_LISTING = """<script type="application/ld+json">{"@type":"Product","name":"
 "offers":{"@type":"AggregateOffer","lowPrice":"34.00","highPrice":"52.00","priceCurrency":"USD"},
 "aggregateRating":{"ratingValue":"4.9","reviewCount":"812"},
 "review":[{"reviewRating":{"ratingValue":5},"reviewBody":"Beautiful collar!","datePublished":"2026-09-01"}]}</script>
-<body><p>Only 3 left</p><p>Ships from United States.</p><p>Returns &amp; exchanges accepted within 30 days</p></body>"""
+<body><p>Only 3 left</p><p>Ships from United Kingdom.</p><p>Returns &amp; exchanges accepted within 30 days</p></body>"""
 
 BLOCKED = "<html><body>Please enable JS and disable any ad blocker<script src='https://js.datadome.co/tags.js'></script></body></html>"
 
 
 def test_ebay_s_item_layout():
-    items = ebay.parse_search(S_ITEM, "ebay.com")
+    items = ebay.parse_search(S_ITEM, "ebay.co.uk")
     assert len(items) == 2  # placeholder card skipped
     a, b = items
     assert a["title"] == "Nintendo Switch OLED White"
-    assert a["price"] == "$229.99"
-    assert a["url"] == "https://www.ebay.com/itm/335512345678"
+    assert a["price"] == "£229.99"
+    assert a["url"] == "https://www.ebay.co.uk/itm/335512345678"
     assert a["condition"] == "Pre-Owned"
-    assert a["shipping"] == "+$12.50 shipping"
-    assert a["location"] == "from United States"
+    assert a["shipping"] == "+£3.99 postage"
+    assert a["location"] == "from United Kingdom"
     assert a["seller"] == "gamerguy (2,345) 99.7%"
     assert a["bids"] == 3 and a["time_left"] == "2d 4h left"
-    assert b["sold_date"] == "Sep 28, 2026" and b["price"] == "$210.00"
-    assert b["shipping"] == "Free shipping" and b["returns"] == "Free returns"
+    assert b["sold_date"] == "28 Sep 2026" and b["price"] == "£210.00"
+    assert b["shipping"] == "Free postage" and b["returns"] == "Free returns"
     assert ebay._total(S_ITEM) == "1,234"
 
 
@@ -133,7 +133,7 @@ def test_ebay_s_card_layout():
 def test_ebay_item_page():
     d = ebay.parse_item(ITEM_PAGE)
     assert d["title"] == "Nintendo Switch OLED White w/ Dock"
-    assert d["price"] == "US $229.99"
+    assert d["price"] == "US £229.99"
     assert d["brand"] == "Nintendo" and d["gtin"] == "0045496883386"
     assert d["availability"] == "InStock"
     assert d["details"] == {"Condition": "Used", "Returns": "30 days returns. Buyer pays for return shipping.", "Color": "White"}
@@ -143,7 +143,7 @@ def test_ebay_item_page():
 
 def args(**kw):
     base = dict(query="switch oled", min=None, max=None, condition=None, bin=False, auction=False, best_offer=False,
-                free_shipping=False, sold=False, location=None, sort="best", page=1, limit=25, site="ebay.com")
+                free_shipping=False, sold=False, location=None, sort="best", page=1, limit=25, site="ebay.co.uk")
     base.update(kw)
     return SimpleNamespace(**base)
 
@@ -151,7 +151,7 @@ def args(**kw):
 def test_ebay_url_builder():
     u = ebay.build_url(args(min=100, max=250, condition="used,refurbished", free_shipping=True, sold=True,
                             sort="price_low", location="domestic", page=2))
-    assert u.startswith("https://www.ebay.com/sch/i.html?_nkw=switch+oled&")
+    assert u.startswith("https://www.ebay.co.uk/sch/i.html?_nkw=switch+oled&")
     for part in ("_udlo=100", "_udhi=250", "LH_ItemCondition=3000%7C2000%7C2010%7C2020%7C2030%7C2500",
                  "LH_FS=1", "LH_Sold=1", "LH_Complete=1", "_sop=15", "LH_PrefLoc=1", "_pgn=2", "_ipg=60"):
         assert part in u
@@ -159,10 +159,12 @@ def test_ebay_url_builder():
 
 def test_etsy_url_and_parsers():
     a = SimpleNamespace(query="dog collar", min=None, max=50, sort="top_reviews", free_shipping=True, handmade=False,
-                        vintage=False, personalizable=True, on_sale=False, ship_to="us", page=1)
+                        vintage=False, personalizable=True, on_sale=False, ship_to=None, page=1, region="uk")
     u = etsy.build_url(a)
-    assert u == ("https://www.etsy.com/search?q=dog+collar&explicit=1&max=50&order=highest_reviews"
-                 "&free_shipping=true&is_personalizable=true&ship_to=US")
+    assert u == ("https://www.etsy.com/uk/search?q=dog+collar&explicit=1&max=50&order=highest_reviews"
+                 "&free_shipping=true&is_personalizable=true&ship_to=GB")
+    a.region, a.ship_to = "us", "ca"
+    assert etsy.build_url(a).startswith("https://www.etsy.com/search?") and etsy.build_url(a).endswith("ship_to=CA")
     s = etsy.parse_search(ETSY_SEARCH)
     assert s[0] == {"title": "Custom Leather Dog Collar", "price": "34.00 USD", "shop": "BarkLeather",
                     "rating": {"stars": "4.9", "reviews": "812"},
@@ -173,7 +175,7 @@ def test_etsy_url_and_parsers():
     assert d["price"] == "34.00–52.00 USD"
     assert d["description"] == "Hand-stitched & made to order."
     assert d["reviews"] == [{"stars": 5, "text": "Beautiful collar!", "date": "2026-09-01"}]
-    assert d["stock"] == "Only 3 left" and d["ships_from"] == "United States"
+    assert d["stock"] == "Only 3 left" and d["ships_from"] == "United Kingdom"
     assert d["returns"].startswith("Returns & exchanges accepted")
 
 
@@ -231,11 +233,22 @@ def test_cli_url_commands_work_offline():
     code, out = run_cli("ebay.py", "url", "lego 10497", "--sort", "price_low", "--bin")
     assert code == 0 and out["ok"] and "LH_BIN=1" in out["url"] and "_sop=15" in out["url"]
     code, out = run_cli("etsy.py", "url", "ceramic mug", "--max", "40")
-    assert code == 0 and out["url"].endswith("q=ceramic+mug&explicit=1&max=40")
+    assert code == 0 and out["url"] == "https://www.etsy.com/uk/search?q=ceramic+mug&explicit=1&max=40&ship_to=GB"
+    code, out = run_cli("ebay.py", "url", "switch", "--location", "europe")
+    assert out["url"].startswith("https://www.ebay.co.uk/") and "LH_PrefLoc=3" in out["url"]
+    code, out = run_cli("ebay.py", "url", "switch", "--site", "ebay.com", "--location", "europe")
+    assert code != 0  # EU filter only exists on eBay UK
+
+
+def test_cli_item_keeps_site_from_link():
+    code, out = run_cli("ebay.py", "item", "https://www.ebay.com/itm/335512345678")
+    assert out["url"] == "https://www.ebay.com/itm/335512345678"
+    code, out = run_cli("ebay.py", "item", "335512345678")
+    assert out["url"] == "https://www.ebay.co.uk/itm/335512345678"
 
 
 def test_cli_reports_network_failure_as_json():
     # The sandbox here can't reach ebay.com/etsy.com, which is exactly the "no network egress" case.
     code, out = run_cli("etsy.py", "search", "mug")
     assert code == 2 and out["ok"] is False and out["reason"] in ("network", "blocked")
-    assert out["url"].startswith("https://www.etsy.com/search?q=mug") and "web_search" in out["next_step"]
+    assert out["url"].startswith("https://www.etsy.com/uk/search?q=mug") and "web_search" in out["next_step"]

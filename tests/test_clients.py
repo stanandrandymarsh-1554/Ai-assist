@@ -43,7 +43,8 @@ def ebay_transport(calls):
             assert req.headers["Authorization"].startswith("Basic ")
             return httpx.Response(200, json={"access_token": "tok", "expires_in": 7200})
         assert req.headers["Authorization"] == "Bearer tok"
-        assert req.headers["X-EBAY-C-MARKETPLACE-ID"] == "EBAY_US"
+        assert req.headers["X-EBAY-C-MARKETPLACE-ID"] == "EBAY_GB"
+        assert req.headers.get("X-EBAY-C-ENDUSERCTX") in (None, "contextualLocation=country%3DGB%2Czip%3DSW1A1AA")
         if req.url.path == "/buy/browse/v1/item_summary/search":
             return httpx.Response(200, json={
                 "total": 1, "offset": 0,
@@ -77,12 +78,13 @@ def ebay_transport(calls):
 
 def test_ebay_search_and_detail():
     calls = []
-    c = eb.EbayClient("id", "secret", http=httpx.AsyncClient(transport=ebay_transport(calls)))
+    c = eb.EbayClient("id", "secret", delivery_postcode="SW1A 1AA",
+                      http=httpx.AsyncClient(transport=ebay_transport(calls)))
     res = run(c.search("switch", max_price=300, conditions=["used"], sort="price_low", limit=5))
     search_req = calls[1]
     assert search_req.url.params["q"] == "switch"
     assert search_req.url.params["sort"] == "price"
-    assert search_req.url.params["filter"].startswith("price:[..300],priceCurrency:USD,conditionIds:{3000")
+    assert search_req.url.params["filter"].startswith("price:[..300],priceCurrency:GBP,conditionIds:{3000")
     item = res["items"][0]
     assert res["total_matches"] == 1
     assert item["price"] == "249.99 USD"

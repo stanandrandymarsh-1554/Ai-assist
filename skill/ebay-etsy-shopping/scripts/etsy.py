@@ -5,9 +5,11 @@ Etsy often blocks automated requests; when it does this prints ok:false with the
 search link and the web_search fallback to use instead.
 
   python3 etsy.py search "personalized leather wallet" --max 60 --sort top_reviews
-  python3 etsy.py listing https://www.etsy.com/listing/123456789/some-title
+  python3 etsy.py listing https://www.etsy.com/uk/listing/123456789/some-title
   python3 etsy.py shop MugMaker
-  python3 etsy.py url "ceramic mug" --free-shipping --ship-to US   # just build the link
+  python3 etsy.py url "ceramic mug" --free-postage                 # just build the link
+
+Defaults to Etsy UK (etsy.com/uk, items that deliver to GB). Use --region us for Etsy US.
 """
 
 from __future__ import annotations
@@ -20,6 +22,8 @@ from urllib.parse import quote, urlencode
 
 from common import FetchError, clean, emit, fail, fetch, json_ld, of_type, segments, strip_html, walk
 
+REGIONS = {"uk": ("/uk", "GB"), "us": ("", "US")}  # path prefix, default ship_to country
+
 SORTS = {
     "relevance": "most_relevant",
     "price_low": "price_asc",
@@ -30,7 +34,7 @@ SORTS = {
 
 NETWORK_HELP = (
     "Code execution can't reach Etsy. Tell the user once that direct search needs claude.ai "
-    "Settings > Capabilities > 'Allow network egress' with etsy.com added to the allowed domains "
+    "Settings > Capabilities > 'Allow network egress' with www.etsy.com added to the allowed domains "
     "(or 'All domains'). Meanwhile use the web_search fallback in SKILL.md and give the user the url above."
 )
 BLOCKED_HELP = (
@@ -54,11 +58,11 @@ def build_url(args) -> str:
                       ("personalizable", "is_personalizable"), ("on_sale", "is_discounted")):
         if getattr(args, flag):
             p[key] = "true"
-    if args.ship_to:
-        p["ship_to"] = args.ship_to.upper()
+    prefix, country = REGIONS[args.region]
+    p["ship_to"] = (args.ship_to or country).upper()
     if args.page > 1:
         p["page"] = str(args.page)
-    return f"https://www.etsy.com/search?{urlencode(p)}"
+    return f"https://www.etsy.com{prefix}/search?{urlencode(p)}"
 
 
 def _price(offers) -> str | None:
@@ -195,8 +199,8 @@ def main() -> None:
         s.add_argument("--min", type=float)
         s.add_argument("--max", type=float)
         s.add_argument("--sort", choices=SORTS, default="relevance")
-        s.add_argument("--free-shipping", action="store_true")
-        s.add_argument("--ship-to", help="two-letter country code, e.g. US")
+        s.add_argument("--free-postage", "--free-shipping", dest="free_shipping", action="store_true")
+        s.add_argument("--ship-to", help="two-letter country code to deliver to (default: GB for uk, US for us)")
         s.add_argument("--handmade", action="store_true")
         s.add_argument("--vintage", action="store_true")
         s.add_argument("--personalizable", action="store_true")
@@ -207,6 +211,8 @@ def main() -> None:
     li.add_argument("listing", help="listing URL or numeric listing id")
     sh = sub.add_parser("shop")
     sh.add_argument("shop", help="shop name or shop URL")
+    for p in sub.choices.values():
+        p.add_argument("--region", choices=REGIONS, default="uk", help="uk (default) or us")
     args = ap.parse_args()
 
     if args.cmd == "url":
@@ -227,7 +233,7 @@ def main() -> None:
         m = re.search(r"/listing/(\d+)", args.listing) or re.fullmatch(r"\s*(\d+)\s*", args.listing)
         if not m:
             sys.exit("Give an Etsy listing URL (…/listing/…) or a numeric listing id.")
-        url = f"https://www.etsy.com/listing/{m.group(1)}"
+        url = f"https://www.etsy.com{REGIONS[args.region][0]}/listing/{m.group(1)}"
         try:
             html = fetch(url)
         except FetchError as e:
@@ -239,7 +245,7 @@ def main() -> None:
 
     m = re.search(r"/shop/([A-Za-z0-9_-]+)", args.shop)
     name = m.group(1) if m else args.shop.strip()
-    url = f"https://www.etsy.com/shop/{quote(name)}"
+    url = f"https://www.etsy.com{REGIONS[args.region][0]}/shop/{quote(name)}"
     try:
         html = fetch(url)
     except FetchError as e:

@@ -192,9 +192,9 @@ class EbayClient:
         self,
         client_id: str,
         client_secret: str,
-        marketplace: str = "EBAY_US",
+        marketplace: str = "EBAY_GB",
         env: str = "production",
-        delivery_location: str | None = None,
+        delivery_postcode: str | None = None,
         http: httpx.AsyncClient | None = None,
     ):
         if env not in HOSTS:
@@ -202,7 +202,7 @@ class EbayClient:
         self.client_id = client_id
         self.client_secret = client_secret
         self.marketplace = marketplace
-        self.delivery_location = delivery_location
+        self.delivery_postcode = delivery_postcode
         self.base = HOSTS[env]
         self.http = http or httpx.AsyncClient(timeout=30)
         self._token: str | None = None
@@ -230,8 +230,10 @@ class EbayClient:
             "X-EBAY-C-MARKETPLACE-ID": self.marketplace,
             "Accept": "application/json",
         }
-        if self.delivery_location:
-            headers["X-EBAY-C-ENDUSERCTX"] = f"contextualLocation=country={self.delivery_location}"
+        if self.delivery_postcode:
+            country = self.marketplace.split("_", 1)[-1]
+            loc = _quote(f"country={country},zip={self.delivery_postcode.replace(' ', '')}")
+            headers["X-EBAY-C-ENDUSERCTX"] = f"contextualLocation={loc}"
         r = await self.http.get(f"{self.base}{path}", params=params, headers=headers)
         if r.status_code == 401:
             self._token = None

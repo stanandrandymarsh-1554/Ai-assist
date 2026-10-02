@@ -24,10 +24,11 @@ mcp = FastMCP(
     instructions=(
         "Tools for searching and inspecting live listings on eBay and Etsy. "
         "Search first, then use the get_* tools on promising results for full details "
-        "(description, shipping, returns, seller/shop reputation). Always give the user "
+        "(description, postage, returns, seller/shop reputation). Always give the user "
         "the listing URL so they can view or buy it themselves; these tools are read-only "
         "and cannot purchase, bid, or message sellers. Prices are as listed and exclude "
-        "tax; check shipping before comparing totals."
+        "import charges on overseas items; check postage before comparing totals. Prices are in GBP "
+        "unless the result says otherwise."
     ),
 )
 
@@ -47,9 +48,9 @@ def ebay() -> EbayClient:
         _ebay = EbayClient(
             cid,
             secret,
-            marketplace=os.getenv("EBAY_MARKETPLACE") or "EBAY_US",
+            marketplace=os.getenv("EBAY_MARKETPLACE") or "EBAY_GB",
             env=(os.getenv("EBAY_ENV") or "production").lower(),
-            delivery_location=os.getenv("EBAY_DELIVERY_LOCATION") or None,
+            delivery_postcode=os.getenv("EBAY_DELIVERY_POSTCODE") or None,
         )
     return _ebay
 
@@ -89,7 +90,7 @@ async def ebay_search(
     free_shipping: bool = False,
     returns_accepted: bool = False,
     item_location_country: Annotated[
-        str | None, Field(description="Two-letter country code where the item is located, e.g. 'US'")
+        str | None, Field(description="Two-letter country code where the item is located, e.g. 'GB'")
     ] = None,
     category_id: Annotated[str | None, Field(description="eBay category ID to restrict results")] = None,
     sort: EbaySort = "best_match",
@@ -117,7 +118,7 @@ async def ebay_search(
 async def ebay_get_item(
     item: Annotated[
         str,
-        Field(description="An eBay item URL (ebay.com/itm/...), item number, or item_id from ebay_search"),
+        Field(description="An eBay item URL (ebay.co.uk/itm/...), item number, or item_id from ebay_search"),
     ],
 ) -> dict[str, Any]:
     """Get full details of one eBay listing: description, item specifics, shipping options, returns, seller."""
@@ -132,7 +133,7 @@ async def etsy_search(
     query: Annotated[str, Field(description="Keywords, e.g. 'personalized leather wallet'")],
     min_price: Annotated[float | None, Field(description="Minimum price in the shop's currency")] = None,
     max_price: Annotated[float | None, Field(description="Maximum price in the shop's currency")] = None,
-    shop_location: Annotated[str | None, Field(description="Shop location filter, e.g. 'United States'")] = None,
+    shop_location: Annotated[str | None, Field(description="Shop location filter, e.g. 'United Kingdom'")] = None,
     taxonomy_id: Annotated[int | None, Field(description="Etsy category (taxonomy) ID")] = None,
     sort: EtsySort = "relevance",
     limit: Annotated[int, Field(ge=1, le=100)] = 20,

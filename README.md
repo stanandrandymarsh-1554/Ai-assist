@@ -13,17 +13,19 @@ on your phone.
 3. Go to **Customize → Skills** (on some layouts it's under Settings →
    Capabilities), choose **Upload skill**, pick the zip, and toggle it on.
    Uploading skills requires a paid plan (Pro, Max, Team or Enterprise).
-4. Recommended: turn on **Allow network egress** and add `ebay.com` and
-   `etsy.com` to the allowed domains (or choose *All domains*). This lets the
+4. Recommended: turn on **Allow network egress** and add these three entries
+   to the allowed domains, exactly as written: `www.ebay.co.uk`,
+   `vi.vipr.ebaydesc.com` (eBay's listing descriptions) and `www.etsy.com`
+   (or choose *All domains*). This lets the
    skill read search results directly. Without it, Claude falls back to its
    built-in web search, which still works but gives less detail.
 
 **Use it.** Just ask, for example:
 
-- "Find a used Switch OLED on eBay under $220 with free shipping."
+- "Find a used Switch OLED on eBay under £200 with free postage."
 - "What do Pyrex 401 bowls actually sell for on eBay?" (uses sold listings)
 - "Find a personalized leather dog collar on Etsy from a highly rated shop."
-- "Is this a good deal? https://www.ebay.com/itm/…"
+- "Is this a good deal? https://www.ebay.co.uk/itm/…"
 
 **What to expect**
 - **eBay** usually works directly once network egress is on.
@@ -34,6 +36,11 @@ on your phone.
   (paid plans) lets it use your own browser.
 - It's read-only. Claude gives you links, and you buy, bid or message
   sellers yourself.
+
+**Updating the skill.** When there's a new version of the zip, go to
+Customize → Skills, delete (or switch off) the old `ebay-etsy-shopping`, and
+upload the new zip. Don't rely on "replace": some users report it keeps the
+old files.
 
 To change the skill, edit the files in `skill/ebay-etsy-shopping/`, run
 `sh skill/build.sh` to rebuild the zip, and upload it again. Run the tests
@@ -61,7 +68,7 @@ yourself.
 
 | Tool | What it does |
 | --- | --- |
-| `ebay_search` | Search eBay with filters for price, condition, auction or Buy It Now, free shipping, returns, item location and sort order |
+| `ebay_search` | Search eBay with filters for price, condition, auction or Buy It Now, free postage, returns, item location and sort order |
 | `ebay_get_item` | Full details for one eBay listing (paste a URL or item number) |
 | `etsy_search` | Search Etsy with filters for price, shop location, category and sort order |
 | `etsy_get_listing` | Full details for one Etsy listing: description, materials, shipping, processing time |
@@ -113,9 +120,9 @@ ETSY_API_KEY=abc123keystring
 ETSY_SHARED_SECRET=xyz789secret
 ```
 
-Optional settings: `EBAY_MARKETPLACE` (default `EBAY_US`; you can also use
-`EBAY_GB`, `EBAY_DE`, `EBAY_AU`, `EBAY_CA` and others) and
-`EBAY_DELIVERY_LOCATION` (for example `US,10001`), which gives you shipping
+Optional settings: `EBAY_MARKETPLACE` (default `EBAY_GB`, eBay UK; you can also use
+`EBAY_US`, `EBAY_IE`, `EBAY_DE`, `EBAY_AU` and others) and
+`EBAY_DELIVERY_POSTCODE` (for example `SW1A 1AA`), which gives you postage
 estimates for your area.
 
 `.env` is git-ignored, so your keys stay off GitHub. You can also pass the keys
@@ -157,12 +164,12 @@ authentication if you expose it.
 
 ## Example things to ask
 
-- "Find me a used Nintendo Switch OLED on eBay under $220 with free shipping,
+- "Find me a used Nintendo Switch OLED on eBay under £200 with free postage,
   sellers with 99%+ feedback only."
 - "Search Etsy for a personalized leather dog collar and show me the 5 best-rated
   shops."
 - "Compare prices for a vintage Pyrex mixing bowl set on eBay vs Etsy."
-- "What are the return terms on https://www.ebay.com/itm/1234567890?"
+- "What are the return terms on https://www.ebay.co.uk/itm/1234567890?"
 - "Read the recent reviews for the Etsy shop MugMaker. Any complaints about
   shipping?"
 
@@ -173,8 +180,8 @@ authentication if you expose it.
 - eBay search returns Buy It Now listings by default. Ask for auctions
   explicitly and the AI will add the `auction` filter.
 - eBay sold/completed-listing history isn't available through the public API.
-- Prices are as listed. They don't include tax, and shipping is reported
-  separately.
+- Prices are as listed. Postage is reported separately, and items sent from
+  outside the UK may carry import VAT or customs charges.
 
 ## Development
 

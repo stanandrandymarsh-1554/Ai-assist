@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Search eBay and read eBay listings without an API key.
 
-  python3 ebay.py search "nintendo switch oled" --max 250 --condition used --free-shipping
+  python3 ebay.py search "nintendo switch oled" --max 200 --condition used --free-postage
   python3 ebay.py search "pyrex 401 bowl" --sold            # what things actually sold for
-  python3 ebay.py item https://www.ebay.com/itm/1234567890
+  python3 ebay.py item https://www.ebay.co.uk/itm/1234567890
+
+Defaults to eBay UK (ebay.co.uk, prices in GBP). Use --site ebay.com for eBay US.
   python3 ebay.py url "lego 10497" --sort price_low         # just build the link, no fetch
 """
 
@@ -27,16 +29,22 @@ CONDITIONS = {
     "for_parts": "7000",
 }
 SORTS = {"best": "12", "price_low": "15", "price_high": "16", "newest": "10", "ending": "1", "distance": "7"}
-LOCATIONS = {"domestic": "1", "north_america": "2", "worldwide": "3"}
+# LH_PrefLoc codes differ by site.
+LOCATIONS = {
+    "ebay.co.uk": {"domestic": "1", "worldwide": "2", "europe": "3"},
+    "ebay.com": {"domestic": "1", "north_america": "2", "worldwide": "3"},
+}
+LOCATION_CHOICES = ["domestic", "europe", "north_america", "worldwide"]
+DEFAULT_SITE = "ebay.co.uk"
 
 NETWORK_HELP = (
     "Code execution can't reach eBay. Tell the user once that direct search needs claude.ai "
-    "Settings > Capabilities > 'Allow network egress' with ebay.com added to the allowed domains "
+    "Settings > Capabilities > 'Allow network egress' with www.ebay.co.uk and vi.vipr.ebaydesc.com added to the allowed domains "
     "(or 'All domains'). Meanwhile use the web_search fallback in SKILL.md and give the user the url above."
 )
 BLOCKED_HELP = (
     "eBay showed a bot-check to this request. Do not retry in a loop. Use the web_search fallback in "
-    "SKILL.md (e.g. query 'site:ebay.com/itm <keywords>'), then web_fetch promising /itm/ result links. "
+    "SKILL.md (e.g. query 'site:ebay.co.uk/itm <keywords>'), then web_fetch promising /itm/ result links. "
     "Give the user the url above so they can open the full results themselves."
 )
 
@@ -67,7 +75,10 @@ def build_url(args) -> str:
         p["LH_Sold"] = "1"
         p["LH_Complete"] = "1"
     if args.location:
-        p["LH_PrefLoc"] = LOCATIONS[args.location]
+        codes = LOCATIONS.get(args.site, {"domestic": "1"})
+        if args.location not in codes:
+            sys.exit(f"--location {args.location} isn't available on {args.site}; use: {', '.join(codes)}")
+        p["LH_PrefLoc"] = codes[args.location]
     if args.sort != "best":
         p["_sop"] = SORTS[args.sort]
     if args.page > 1:
@@ -131,9 +142,9 @@ def parse_search(html: str, site: str) -> list[dict]:
                 continue
             if "condition" not in item and _COND.match(t) and len(t) < 60:
                 item["condition"] = t.split("·")[0].strip(" ·|")
-            elif re.match(r"^sold\s+\w{3}\s+\d", low):
+            elif re.match(r"^sold\s+(\w{3}\s+\d|\d{1,2}\s+\w{3})", low):  # "Sold Sep 28" / "Sold 28 Sep"
                 item["sold_date"] = t[4:].strip()
-            elif "delivery" in low or "shipping" in low:
+            elif any(w in low for w in ("postage", "delivery", "shipping", "collection")):
                 item.setdefault("shipping", t)
             elif "return" in low:
                 item.setdefault("returns", t)
@@ -251,16 +262,16 @@ def main() -> None:
         s.add_argument("--bin", action="store_true", help="Buy It Now only")
         s.add_argument("--auction", action="store_true", help="auctions only")
         s.add_argument("--best-offer", action="store_true")
-        s.add_argument("--free-shipping", action="store_true")
+        s.add_argument("--free-postage", "--free-shipping", dest="free_shipping", action="store_true")
         s.add_argument("--sold", action="store_true", help="sold listings (real selling prices)")
-        s.add_argument("--location", choices=LOCATIONS)
+        s.add_argument("--location", choices=LOCATION_CHOICES, help="domestic = UK only on ebay.co.uk")
         s.add_argument("--sort", choices=SORTS, default="best")
         s.add_argument("--page", type=int, default=1)
         s.add_argument("--limit", type=int, default=25, help="max results to print")
-        s.add_argument("--site", default="ebay.com", help="e.g. ebay.co.uk, ebay.de, ebay.com.au")
+        s.add_argument("--site", default=DEFAULT_SITE, help="default ebay.co.uk; or ebay.com, ebay.de, ebay.ie ...")
     it = sub.add_parser("item")
     it.add_argument("item", help="item URL or item number")
-    it.add_argument("--site", default="ebay.com")
+    it.add_argument("--site", default=DEFAULT_SITE)
     it.add_argument("--no-description", action="store_true")
     args = ap.parse_args()
 
@@ -286,7 +297,8 @@ def main() -> None:
     m = re.search(r"/itm/(?:[^/?#]+/)?(\d{9,15})", args.item) or re.fullmatch(r"\s*(\d{9,15})\s*", args.item)
     if not m:
         sys.exit("Give an eBay item URL (…/itm/…) or a 9-15 digit item number.")
-    url = f"https://www.{args.site}/itm/{m.group(1)}"
+    site = re.search(r"\b(ebay\.[a-z.]+?)/itm/", args.item)  # keep the site the link came from
+    url = f"https://www.{site.group(1) if site else args.site}/itm/{m.group(1)}"
     try:
         html = fetch(url)
     except FetchError as e:
