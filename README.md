@@ -16,18 +16,41 @@ Desktop and Cowork.
 
 It's read-only. It never buys, bids or messages anyone.
 
-## Setup (one time, about 15 minutes)
+## Setup (one time: about 15 minutes of clicking, plus waiting for approval)
 
-### 1. Get free API keys
+### 1. Get the API keys
 
-You can set up just one site; the other's tools will say they aren't set up.
+Both are free, but **neither is instant**. Start with eBay: it's quicker,
+and the connector works with eBay alone. Add Etsy later, when its key
+arrives.
 
-- **eBay:** sign in at <https://developer.ebay.com>, open **Application
-  Keys**, and create a **Production** keyset. When it asks about
-  *Marketplace Account Deletion*, choose the exemption (this connector stores
-  no eBay user data). Copy the **App ID** and **Cert ID**.
-- **Etsy:** create an app at <https://www.etsy.com/developers/register>.
-  Copy the **Keystring** and **Shared Secret**.
+**eBay: usually about 1 business day**
+1. Join the eBay Developers Program at <https://developer.ebay.com>
+   (*Register*). You can use your normal eBay login. Approval takes about a
+   business day, and you get an email.
+2. Once approved, open **Hi \<name\> → Application Keys** and click
+   **Create a keyset** under **Production**. Give the application any name,
+   e.g. *Marketplace Bridge*.
+3. The production keyset starts out **disabled**. Click the link in the
+   notice to complete *Marketplace Account Deletion*, choose **I do not
+   persist eBay data** (the exemption), and give a short reason like
+   "Read-only personal search tool, stores no eBay user data". The keyset
+   activates straight away.
+4. Copy the **App ID (Client ID)** and **Cert ID (Client Secret)** from
+   the Production column. Use those, not the Sandbox ones.
+
+**Etsy: anywhere from 2 days to a few weeks**
+1. Sign in to Etsy and go to <https://www.etsy.com/developers/register>.
+2. Fill in the app form. The description is what gets reviewed, so be
+   specific, for example: *"Personal, read-only tool that searches public
+   Etsy listings and shop reviews to help me compare products. No selling,
+   no buyer data, no data stored."*
+3. The app shows **Pending Personal Approval**. Etsy says this usually
+   takes a day or two, but personal apps are reviewed more closely, and
+   waits of a week or more are common. If it's stuck after a week or so,
+   contact Etsy through <https://developers.etsy.com/documentation/get-help/>.
+4. When approved, open the app under **Your apps** and copy the
+   **Keystring** and the **Shared Secret**. You need both.
 
 ### 2. Deploy to Vercel (free)
 
@@ -46,6 +69,9 @@ You can set up just one site; the other's tools will say they aren't set up.
    | `EBAY_POSTCODE` | Optional. Your postcode, for accurate postage. |
 
 4. Click **Deploy**. Note your address, e.g. `https://marketplace-bridge-abc.vercel.app`.
+5. Adding the Etsy key later: put the two Etsy values under **Settings →
+   Environment Variables**, then **Deployments → ⋯ → Redeploy** so the new
+   values take effect. Your connector link stays the same.
 
 ### 3. Add it to Claude
 
