@@ -1,0 +1,212 @@
+<title>Copy for Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one narrow column, a price-tag "button" as the hero, device tabs for install steps, a sample of the copied text. */
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --fg: #16202a;
+  --muted: #5a6776;
+  --line: #d9dfe5;
+  --accent: #0b6e4f;
+  --tag: #ffd84d;
+  --tag-ink: #2a2200;
+  --code-bg: #eef1f4;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101417; --surface: #171d21; --fg: #e7ecef; --muted: #9aa6b2; --line: #2a333a;
+    --accent: #5fd3a6; --tag: #f2c94c; --tag-ink: #241c00; --code-bg: #0c1013; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101417; --surface: #171d21; --fg: #e7ecef; --muted: #9aa6b2; --line: #2a333a;
+  --accent: #5fd3a6; --tag: #f2c94c; --tag-ink: #241c00; --code-bg: #0c1013; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.55 var(--body); }
+.wrap { max-width: 680px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 64px; display: grid; gap: 36px; }
+h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2rem, 6vw, 2.8rem); font-weight: 800; line-height: 1.05; }
+h2 { font-size: 1.35rem; font-weight: 600; }
+p { margin: 0; }
+.lede { color: var(--muted); font-size: 1.08rem; max-width: 58ch; margin-top: 12px; }
+.eyebrow { font: 600 0.75rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+section { display: grid; gap: 14px; }
+
+/* The draggable price tag */
+.tag-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; }
+.tag {
+  position: relative; display: inline-flex; align-items: center; gap: 10px;
+  background: var(--tag); color: var(--tag-ink); text-decoration: none;
+  font: 800 1.05rem/1 var(--display); padding: 14px 20px 14px 34px;
+  clip-path: polygon(16px 0, 100% 0, 100% 100%, 16px 100%, 0 50%);
+  border-radius: 0 10px 10px 0; cursor: grab; user-select: none;
+}
+.tag::before { content: ""; position: absolute; left: 14px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: var(--bg); }
+.tag:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.hint { color: var(--muted); font-size: 0.92rem; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--code-bg); border-radius: 10px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+.tabs button { font: 700 0.92rem var(--body); border: 0; background: transparent; color: var(--muted); padding: 8px 14px; border-radius: 7px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+ol.steps { margin: 0; padding-left: 1.4em; display: grid; gap: 10px; }
+ol.steps li::marker { font-family: var(--mono); color: var(--accent); font-weight: 600; }
+kbd, code { font-family: var(--mono); font-size: 0.86em; background: var(--code-bg); padding: 1px 6px; border-radius: 5px; }
+
+.btn { font: 700 0.95rem var(--body); border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 10px 16px; border-radius: 9px; cursor: pointer; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.code-box { display: grid; gap: 10px; }
+textarea { width: 100%; height: 88px; resize: vertical; font: 12px/1.4 var(--mono); color: var(--muted); background: var(--code-bg); border: 1px solid var(--line); border-radius: 9px; padding: 10px; }
+.status { font-size: 0.9rem; color: var(--accent); min-height: 1.4em; }
+
+.links { display: flex; flex-wrap: wrap; gap: 10px; }
+.links a { color: var(--fg); text-decoration: none; border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; border-radius: 999px; font-weight: 700; font-size: 0.92rem; }
+.links a:hover { border-color: var(--accent); }
+
+.sample { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.sample header { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); font: 600 0.75rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.sample pre { margin: 0; padding: 14px; overflow-x: auto; font: 12.5px/1.55 var(--mono); color: var(--fg); }
+.note { color: var(--muted); font-size: 0.92rem; }
+@media (prefers-reduced-motion: no-preference) { .tag { transition: transform .15s ease; } .tag:hover { transform: rotate(-2deg); } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">eBay UK · Etsy UK</p>
+    <h1>Copy for Claude</h1>
+    <p class="lede">A bookmark button. Open any eBay or Etsy page, tap it, and the listings on screen are copied as tidy text. Paste that into Claude and ask your question. It runs in your own browser, so there are no bot-checks and no API keys.</p>
+  </header>
+
+  <section aria-labelledby="install-h">
+    <h2 id="install-h">Install the button</h2>
+    <div class="tabs" role="tablist" aria-label="Device">
+      <button role="tab" id="tab-desktop" aria-controls="panel-desktop" aria-selected="true">Computer</button>
+      <button role="tab" id="tab-iphone" aria-controls="panel-iphone" aria-selected="false">iPhone / iPad</button>
+      <button role="tab" id="tab-android" aria-controls="panel-android" aria-selected="false">Android</button>
+    </div>
+
+    <div role="tabpanel" id="panel-desktop" aria-labelledby="tab-desktop">
+      <div class="tag-row">
+        <a class="tag" id="tag" href="#" draggable="true" aria-label="Copy for Claude bookmarklet. Drag to your bookmarks bar.">Copy for Claude</a>
+        <p class="hint">Drag this tag onto your bookmarks bar.<br>No bar? Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> on a Mac).</p>
+      </div>
+      <p class="note" style="margin-top:12px">If dragging doesn't work, make a new bookmark called <b>Copy for Claude</b> and paste the code from the box below as its address.</p>
+    </div>
+
+    <div role="tabpanel" id="panel-iphone" aria-labelledby="tab-iphone" hidden>
+      <ol class="steps">
+        <li>Tap <b>Copy code</b> below.</li>
+        <li>In Safari, bookmark any page: tap Share, then <b>Add Bookmark</b>, and name it <b>Copy for Claude</b>.</li>
+        <li>Open Bookmarks, tap <b>Edit</b>, then tap the new bookmark.</li>
+        <li>Clear the address and paste the code. Tap Done.</li>
+        <li>To use it: on an eBay or Etsy page, open Bookmarks and tap <b>Copy for Claude</b>.</li>
+      </ol>
+    </div>
+
+    <div role="tabpanel" id="panel-android" aria-labelledby="tab-android" hidden>
+      <ol class="steps">
+        <li>Tap <b>Copy code</b> below.</li>
+        <li>In Chrome, bookmark any page (⋮ menu, then ☆), then tap <b>Edit</b>.</li>
+        <li>Rename it <b>Copy for Claude</b>, clear the URL and paste the code. Save.</li>
+        <li>To use it: on an eBay or Etsy page, tap the address bar and type <b>Copy for Claude</b>, then tap the bookmark that appears. Chrome on Android won't run it from the bookmarks list, only from the address bar.</li>
+      </ol>
+    </div>
+
+    <div class="code-box">
+      <textarea id="code" readonly aria-label="Bookmarklet code"></textarea>
+      <div class="tag-row">
+        <button class="btn primary" id="copy-code" type="button">Copy code</button>
+        <span class="status" id="status" role="status"></span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="use-h">
+    <h2 id="use-h">Use it</h2>
+    <ol class="steps">
+      <li>Open a search or a listing. Use filters on the site as normal (price, condition, "Sold items" for real selling prices).</li>
+      <li>Tap <b>Copy for Claude</b>. A small panel confirms what was copied. If it says to copy manually, tap <b>Copy</b> in the panel.</li>
+      <li>Paste into your Claude chat with your question, for example "Which of these is the best deal?" or "Is this seller trustworthy?"</li>
+    </ol>
+    <div class="links">
+      <a href="https://www.ebay.co.uk/" target="_blank" rel="noopener">Open eBay UK</a>
+      <a href="https://www.etsy.com/uk/" target="_blank" rel="noopener">Open Etsy UK</a>
+      <a href="https://claude.ai/new" target="_blank" rel="noopener">Open Claude</a>
+    </div>
+    <p class="note">For more results, scroll down first or tap it again on the next page. It only reads the page you're looking at. It doesn't click, buy or send anything.</p>
+  </section>
+
+  <section aria-labelledby="sample-h">
+    <h2 id="sample-h">What gets copied</h2>
+    <div class="sample">
+      <header><span>Example</span><span>eBay UK sold listings</span></header>
+<pre>### Copied for Claude · eBay UK sold listings · 2 items · 02/10/2026
+Page: https://www.ebay.co.uk/sch/i.html?_nkw=switch+oled&amp;LH_Sold=1&amp;LH_Complete=1
+
+1. Nintendo Switch OLED White
+   Pre-owned | £164.99 | +£3.99 postage | from United Kingdom | gamerguy (2,345) 99.7%
+   https://www.ebay.co.uk/itm/335512345678
+2. Switch OLED Neon + 3 games
+   Sold 28 Sep 2026 | £189.00 | Free postage
+   https://www.ebay.co.uk/itm/226612345678</pre>
+    </div>
+  </section>
+</div>
+
+<script>
+const BOOKMARKLET = "javascript:(()%3D%3E%7Bconst%20e%3De%3D%3E(e%7C%7C%22%22).replace(%2F%5Cs%2B%2Fg%2C%22%20%22).trim()%2Ct%3Dlocation.hostname%2Cn%3Dlocation.pathname%2Ci%3D(e%2Ct%3Ddocument)%3D%3Et.querySelector(e)%2Co%3D(e%2Ct%3Ddocument)%3D%3EArray.from(t.querySelectorAll(e))%2Cs%3D%2F%5E(opens%20in%20a%20new%20window%20or%20tab%7Csponsored%7Cnew%20listing%7Cshop%20on%20ebay%7Cwatch%7Cwatching%7Csave%7Csaved%7Cad%7Cad%20by%20etsy%20seller%7Cadd%20to%20favourites%7Cadd%20to%20favorites%7Cremove%20from%20favourites%7Csee%20more%20like%20this%7Cmore%20like%20this%7Cmore%20colours%7Cmore%20colors%7C%5C%7C%7C%C2%B7%7C%E2%80%A2%7C-)%24%2Fi%2Ca%3D(t%2Cn%3D%5B%5D)%3D%3E%7Bconst%20i%3Dnew%20Set(n.map(e))%2Co%3D%5B%5D%3Bfor(const%20n%20of(t.innerText%7C%7Ct.textContent%7C%7C%22%22).split(%22%5Cn%22))%7Bconst%20t%3De(n)%3B!t%7C%7Ci.has(t)%7C%7Cs.test(t)%7C%7Ct.length%3E140%7C%7C(i.add(t)%2Co.push(t))%7Dreturn%20o%7D%2Cr%3De%3D%3E%7Bif(!(e%3D%5B%5D.concat(e%7C%7C%5B%5D)%5B0%5D))return%22%22%3Bconst%20t%3De.priceCurrency%7C%7C%22%22%3Breturn%20null!%3De.price%3F%60%24%7Be.price%7D%20%24%7Bt%7D%60.trim()%3Anull!%3De.lowPrice%3F%60%24%7Be.lowPrice%7D%24%7Be.highPrice%26%26e.highPrice!%3De.lowPrice%3F%22%E2%80%93%22%2Be.highPrice%3A%22%22%7D%20%24%7Bt%7D%60.trim()%3A%22%22%7D%2Cl%3De%3D%3E%7Bconst%20t%3Di(%22main%22)%7C%7Ci(%22%23mainContent%22)%7C%7Ci(%22%23content%22)%7C%7Cdocument.body%2Cn%3Da(t).join(%22%5Cn%22)%3Breturn%20n.length%3Ee%3Fn.slice(0%2Ce)%2B%22%5Cn%E2%80%A6(trimmed)%22%3An%7D%2Cc%3D%2F(%5E%7C%5C.)ebay%5C.%2F.test(t)%7C%7C!!i(%22li.s-item%2C%20li.s-card%2C%20.x-item-title%22)%2Cd%3D%2F(%5E%7C%5C.)etsy%5C.com%24%2F.test(t)%7C%7C!!i(%22%5Bdata-listing-id%5D%22)%2Cp%3Dc%3Ft.endsWith(%22.co.uk%22)%3F%22eBay%20UK%22%3At.replace(%2F%5Ewww%5C.%2F%2C%22%22)%7C%7C%22eBay%22%3Ad%3Fn.startsWith(%22%2Fuk%22)%3F%22Etsy%20UK%22%3A%22Etsy%22%3At%2Cu%3D%2F(%5E%7C%5C.)ebay%5C.%2F.test(t)%3F%60https%3A%2F%2F%24%7Bt%7D%60%3A%22https%3A%2F%2Fwww.ebay.co.uk%22%3Blet%20m%3D%22page%22%2Ch%3D%5B%5D%2Cf%3D0%3Bif(c%26%26%2F%5C%2Fitm%5C%2F%2F.test(n)%7C%7Cc%26%26i(%22.x-item-title%22))%7Bm%3D%22listing%22%3Bconst%20t%3De((i(%22.x-item-title__mainTitle%22)%7C%7Ci(%22h1%22)%7C%7C%7B%7D).innerText)%3Bh.push(%60Title%3A%20%24%7Bt%7D%60)%3Bconst%20n%3D(e%2Ct)%3D%3E%7Bconst%20n%3Di(t)%3Bif(n)%7Bconst%20t%3Da(n).join(%22%20%C2%B7%20%22)%3Bt%26%26h.push(%60%24%7Be%7D%3A%20%24%7Bt%7D%60)%7D%7D%3Bn(%22Price%22%2C%22.x-price-primary%22)%2Cn(%22Bids%20%2F%20time%20left%22%2C%22.x-bid-count%2C%20.x-end-time%2C%20.x-timer%22)%2Cn(%22Quantity%22%2C%22.x-quantity%22)%2Cn(%22Seller%22%2C%22.x-sellercard-atf%2C%20%5Bdata-testid%3D'x-sellercard-atf'%5D%22)%3Bconst%20s%3Do(%22.ux-labels-values%22).map(t%3D%3E%7Bconst%20n%3Di(%22.ux-labels-values__labels%22%2Ct)%2Co%3Di(%22.ux-labels-values__values%22%2Ct)%3Breturn%20n%26%26o%3F%60%24%7Be(n.innerText).replace(%2F%3A%24%2F%2C%22%22)%7D%3A%20%24%7Ba(o).filter(e%3D%3E!%2F%5E(see%20all%20condition%20definitions%7Cread%20more%7Csee%20details)%2Fi.test(e)).join(%22%20%22)%7D%60%3A%22%22%7D).filter(Boolean)%3Bs.length%26%26h.push(%22Details%3A%22%2C...%5B...new%20Set(s)%5D.map(e%3D%3E%22%20%20%22%2Be.slice(0%2C300)))%3Bconst%20r%3Do(%22iframe%22).map(e%3D%3Ee.src).find(e%3D%3E%2Febaydesc%5C.com%2F.test(e))%3Br%26%26h.push(%60Seller's%20description%20(separate%20page)%3A%20%24%7Br%7D%60)%2Cf%3D1%7Delse%20if(c)%7Bm%3D%2FLH_Sold%3D1%2F.test(location.search)%3F%22sold%20listings%22%3A%22search%20results%22%3Bconst%20t%3Dnew%20Set%3Bfor(const%20n%20of%20o(%22li.s-item%2C%20li.s-card%2C%20li%5Bdata-listingid%5D%22))%7Bconst%20s%3Do(%22a%5Bhref*%3D'%2Fitm%2F'%5D%22%2Cn)%5B0%5D%2Cr%3Ds%26%26s.href.match(%2F%5C%2Fitm%5C%2F(%3F%3A%5B%5E%2F%3F%23%5D%2B%5C%2F)%3F(%5Cd%7B9%2C15%7D)%2F)%3Bif(!r%7C%7C%22123456%22%3D%3D%3Dr%5B1%5D%7C%7Ct.has(r%5B1%5D))continue%3Bt.add(r%5B1%5D)%3Bconst%20l%3Di(%22.s-item__title%2C%20.s-card__title%2C%20%5Brole%3D'heading'%5D%22%2Cn)%3Blet%20c%3De(l%3Fl.innerText%3A%22%22).replace(%2F%5Enew%20listing%5Cs*%2Fi%2C%22%22).replace(%2F%5Cs*opens%20in%20a%20new%20window%20or%20tab%24%2Fi%2C%22%22)%3Bc%7C%7C(c%3De((i(%22img%5Balt%5D%22%2Cn)%7C%7C%7B%7D).alt))%3Bconst%20d%3Da(n%2C%5Bc%2Cl%3Fl.innerText%3A%22%22%5D).slice(0%2C9)%3Bf%2B%2B%2Ch.push(%60%24%7Bf%7D.%20%24%7Bc%7D%60%2C%60%20%20%20%24%7Bd.join(%22%20%7C%20%22)%7D%60%2C%60%20%20%20%24%7Bu%7D%2Fitm%2F%24%7Br%5B1%5D%7D%60)%7D%7Delse%20if(d%26%26%2F%5C%2Flisting%5C%2F%5Cd%2B%2F.test(n))%7Bm%3D%22listing%22%3Bconst%20t%3D(()%3D%3E%7Bconst%20e%3D%5B%5D%2Ct%3Dn%3D%3E%7Bif(Array.isArray(n))return%20n.forEach(t)%3Bn%26%26%22object%22%3D%3Dtypeof%20n%26%26(e.push(n)%2CObject.values(n).forEach(t))%7D%3Bfor(const%20e%20of%20o('script%5Btype%3D%22application%2Fld%2Bjson%22%5D'))try%7Bt(JSON.parse(e.textContent))%7Dcatch(e)%7B%7Dreturn%20e.filter(e%3D%3E%5B%5D.concat(e%5B%22%40type%22%5D).includes(%22Product%22))%7D)()%5B0%5D%2Cn%3De(t%26%26t.name)%7C%7Ce((i(%22h1%22)%7C%7C%7B%7D).innerText)%3Bif(h.push(%60Title%3A%20%24%7Bn%7D%60)%2Ct)%7Bconst%20e%3Dt.aggregateRating%7C%7C%7B%7D%2Cn%3Dt.brand%26%26(t.brand.name%7C%7Ct.brand)%3Bh.push(...%5Br(t.offers)%26%26%60Price%3A%20%24%7Br(t.offers)%7D%60%2Cn%26%26%60Shop%3A%20%24%7Bn%7D%60%2Ce.ratingValue%26%26%60Rating%3A%20%24%7Be.ratingValue%7D%E2%98%85%20from%20%24%7Be.reviewCount%7C%7Ce.ratingCount%7C%7C%22%3F%22%7D%20reviews%60%5D.filter(Boolean))%7Dh.push(%22Page%20text%3A%22%2Cl(7e3))%2Cf%3D1%7Delse%20if(d)%7Bm%3Dn.startsWith(%22%2Fshop%22)%7C%7Cn.includes(%22%2Fshop%2F%22)%3F%22shop%20page%22%3A%22search%20results%22%3Bconst%20t%3Dnew%20Set%3Bfor(const%20n%20of%20o(%22a%5Bhref*%3D'%2Flisting%2F'%5D%22))%7Bconst%20s%3Dn.href.match(%2F%5C%2Flisting%5C%2F(%5Cd%2B)%2F)%3Bif(!s%7C%7Ct.has(s%5B1%5D))continue%3Bt.add(s%5B1%5D)%3Blet%20r%3Dn%3Bfor(%3Br.parentElement%26%26r.parentElement!%3D%3Ddocument.body%3B)%7Bif(new%20Set(o(%22a%5Bhref*%3D'%2Flisting%2F'%5D%22%2Cr.parentElement).map(e%3D%3E(e.href.match(%2F%5C%2Flisting%5C%2F(%5Cd%2B)%2F)%7C%7C%5B%5D)%5B1%5D)).size%3E1)break%3Br%3Dr.parentElement%7Dconst%20l%3Di(%22h2%2C%20h3%2C%20.v2-listing-card__title%22%2Cr)%2Cc%3De(n.getAttribute(%22title%22))%7C%7Ce(l%26%26l.innerText)%7C%7Ce((i(%22img%5Balt%5D%22%2Cr)%7C%7C%7B%7D).alt)%2Cd%3Da(r%2C%5Bc%5D).slice(0%2C8)%3Bf%2B%2B%2Ch.push(%60%24%7Bf%7D.%20%24%7Bc%7D%60%2C%60%20%20%20%24%7Bd.join(%22%20%7C%20%22)%7D%60%2C%60%20%20%20%24%7Bn.href.split(%22%3F%22)%5B0%5D%7D%60)%7Dif(%22shop%20page%22%3D%3D%3Dm)%7Bconst%20e%3Di(%22%5Bdata-region%3D'shop-header'%5D%2C%20.shop-home-wider-sections%2C%20header%22)%7C%7Cnull%3Be%26%26h.unshift(%22Shop%20info%3A%20%22%2Ba(e).slice(0%2C12).join(%22%20%7C%20%22)%2C%22%22)%7D%7Df%7C%7C(m%3D%22page%22%2Ch%3D%5B%22Page%20text%3A%22%2Cl(9e3)%5D)%3Bconst%20g%3D%5B%60%23%23%23%20Copied%20for%20Claude%20%C2%B7%20%24%7Bp%7D%20%24%7Bm%7D%24%7Bf%3E1%3F%60%20%C2%B7%20%24%7Bf%7D%20items%60%3A%22%22%7D%20%C2%B7%20%24%7B(new%20Date).toLocaleDateString(%22en-GB%22)%7D%60%2C%60Page%3A%20%24%7Blocation.href%7D%60%2C%22%22%5D.concat(h).join(%22%5Cn%22)%2Cx%3Ddocument.getElementById(%22c4c-panel%22)%3Bx%26%26x.remove()%3Bconst%20y%3Ddocument.createElement(%22div%22)%3By.id%3D%22c4c-panel%22%2Cy.setAttribute(%22style%22%2C%22position%3Afixed%3Bz-index%3A2147483647%3Bleft%3A12px%3Bright%3A12px%3Bbottom%3A12px%3Bmax-width%3A460px%3Bmargin%3A0%20auto%3Bbackground%3A%231d2421%3Bcolor%3A%23f3f6f4%3Bfont%3A14px%2F1.4%20-apple-system%2Csystem-ui%2Csans-serif%3Bborder-radius%3A12px%3Bpadding%3A14px%3Bbox-shadow%3A0%208px%2030px%20rgba(0%2C0%2C0%2C.35)%22)%3Bconst%20b%3Ddocument.createElement(%22div%22)%3Bb.style.marginBottom%3D%2210px%22%3Bconst%20%24%3Ddocument.createElement(%22textarea%22)%3B%24.value%3Dg%2C%24.readOnly%3D!0%2C%24.setAttribute(%22style%22%2C%22width%3A100%25%3Bbox-sizing%3Aborder-box%3Bheight%3A90px%3Bfont%3A12px%2F1.35%20ui-monospace%2Cmonospace%3Bborder-radius%3A8px%3Bborder%3A0%3Bpadding%3A8px%3Bbackground%3A%230f1412%3Bcolor%3A%23cfe3d9%22)%3Bconst%20w%3Ddocument.createElement(%22div%22)%3Bw.setAttribute(%22style%22%2C%22display%3Aflex%3Bgap%3A8px%3Bmargin-top%3A10px%22)%3Bconst%20v%3D(e%2Ct%2Cn)%3D%3E%7Bconst%20i%3Ddocument.createElement(%22button%22)%3Breturn%20i.textContent%3De%2Ci.setAttribute(%22style%22%2C%60flex%3A1%3Bpadding%3A10px%3Bborder-radius%3A8px%3Bborder%3A0%3Bfont%3A600%2014px%20system-ui%2Csans-serif%3Bcursor%3Apointer%3Bbackground%3A%24%7Bn%3F%22%237fd1a8%22%3A%22%2333403a%22%7D%3Bcolor%3A%24%7Bn%3F%22%230f1412%22%3A%22%23f3f6f4%22%7D%60)%2Ci.onclick%3Dt%2Ci%7D%2CC%3D%22listing%22%3D%3D%3Dm%7C%7C%22page%22%3D%3D%3Dm%3F%60this%20%24%7Bp%7D%20%24%7Bm%7D%60%3A%60%24%7Bf%7D%20%24%7Bp%7D%20listing%24%7B1%3D%3D%3Df%3F%22%22%3A%22s%22%7D%60%2CS%3D()%3D%3E%7Bb.textContent%3D%60%E2%9C%93%20Copied%20%24%7BC%7D.%20Now%20paste%20it%20into%20your%20Claude%20chat.%60%7D%2C_%3D()%3D%3E%7Bconst%20e%3D()%3D%3E%7B%24.focus()%2C%24.select()%2C%24.setSelectionRange(0%2Cg.length)%3Blet%20e%3D!1%3Btry%7Be%3Ddocument.execCommand(%22copy%22)%7Dcatch(e)%7B%7Db.textContent%3De%3F%60%E2%9C%93%20Copied%20%24%7BC%7D.%20Now%20paste%20it%20into%20your%20Claude%20chat.%60%3A%22Select%20all%20the%20text%20in%20the%20box%20and%20copy%20it%2C%20then%20paste%20it%20into%20Claude.%22%7D%3Bnavigator.clipboard%26%26navigator.clipboard.writeText%3Fnavigator.clipboard.writeText(g).then(S%2Ce)%3Ae()%7D%3Bb.textContent%3D%60Ready%3A%20%24%7BC%7D.%60%2Cw.append(v(%22Copy%22%2C_%2C!0)%2Cv(%22Close%22%2C()%3D%3Ey.remove()))%2Cy.append(b%2C%24%2Cw)%2Cdocument.body.appendChild(y)%2C_()%2Cwindow.__copyForClaude%3Dg%7D)()%3B";
+const tag = document.getElementById("tag");
+const code = document.getElementById("code");
+const status = document.getElementById("status");
+tag.href = BOOKMARKLET;
+code.value = BOOKMARKLET;
+
+// Clicking the tag here would just copy this page; it's meant to be dragged.
+tag.addEventListener("click", (e) => {
+  e.preventDefault();
+  status.textContent = "Drag the tag to your bookmarks bar, or use Copy code.";
+});
+
+document.getElementById("copy-code").addEventListener("click", () => {
+  const selectBox = () => { code.focus(); code.select(); code.setSelectionRange(0, code.value.length); };
+  const fallback = () => { selectBox(); status.textContent = "Code selected. Copy it with your device's Copy command."; };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(BOOKMARKLET).then(() => { status.textContent = "Code copied."; }, fallback);
+  } else fallback();
+});
+
+const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+function show(id) {
+  tabs.forEach((t) => {
+    const on = t.id === id;
+    t.setAttribute("aria-selected", String(on));
+    t.tabIndex = on ? 0 : -1;
+    document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+  });
+  try { localStorage.setItem("c4c-tab", id); } catch (e) {}
+}
+tabs.forEach((t, i) => {
+  t.addEventListener("click", () => show(t.id));
+  t.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+    show(next.id); next.focus();
+  });
+});
+let start = "tab-desktop";
+try { start = localStorage.getItem("c4c-tab") || ""; } catch (e) {}
+if (!document.getElementById(start)) {
+  const ua = navigator.userAgent;
+  start = /iPhone|iPad|iPod/.test(ua) ? "tab-iphone" : /Android/.test(ua) ? "tab-android" : "tab-desktop";
+}
+show(start);
+</script>

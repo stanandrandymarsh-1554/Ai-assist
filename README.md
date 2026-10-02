@@ -1,50 +1,57 @@
-# Ai-assist: eBay + Etsy shopping for Claude
+# Ai-assist: eBay + Etsy shopping for Claude (UK)
 
-## Easiest: the Claude Skill (no API keys)
+Two parts that work together, with no API keys:
 
-`ebay-etsy-shopping.zip` is a **Claude Skill**. You upload it to claude.ai
-once, and Claude can then search eBay and Etsy for you in any chat, including
-on your phone.
+1. **Copy for Claude**: a bookmark button for your browser. On any eBay or
+   Etsy page, tap it, and the listings on screen are copied as tidy text.
+   Paste that into Claude. This runs in your own browser, so eBay's and
+   Etsy's bot-checks don't get in the way.
+   Setup page: <https://claude.ai/artifact/Fuz14zptEcbx1Sp3GZpS3h>
+   (source in `bookmarklet/`).
+2. **The Claude Skill** (`ebay-etsy-shopping.zip`). This teaches Claude to
+   build filtered eBay UK and Etsy UK search links (price, condition, sold
+   prices, free postage...), read what you paste from the button, and
+   compare and flag risks. It also gives a first look using web search.
 
-**Install (one time)**
-1. Download [`ebay-etsy-shopping.zip`](ebay-etsy-shopping.zip).
-2. In claude.ai, go to **Settings → Capabilities**. Make sure **Code execution
-   and file creation** is on.
+### Why the button?
+
+eBay and Etsy block automated requests coming from Claude's servers. In
+testing, every direct search got a bot-check, even with the sites on the
+allowed-domains list. eBay's old search feed is gone too. Reading the page in
+your own browser is the reliable way to give Claude real, current listings.
+
+### Install
+
+1. Open the setup page above and add the **Copy for Claude** button
+   (instructions for computer, iPhone and Android are on the page).
+2. In claude.ai, turn on **Settings → Capabilities → Code execution and file
+   creation**.
 3. Go to **Customize → Skills** (on some layouts it's under Settings →
-   Capabilities), choose **Upload skill**, pick the zip, and toggle it on.
-   Uploading skills requires a paid plan (Pro, Max, Team or Enterprise).
-4. Recommended: turn on **Allow network egress** and add these three entries
-   to the allowed domains, exactly as written: `www.ebay.co.uk`,
-   `vi.vipr.ebaydesc.com` (eBay's listing descriptions) and `www.etsy.com`
-   (or choose *All domains*). This lets the
-   skill read search results directly. Without it, Claude falls back to its
-   built-in web search, which still works but gives less detail.
+   Capabilities). Delete any older `ebay-etsy-shopping`, then **Upload
+   skill**, pick [`ebay-etsy-shopping.zip`](ebay-etsy-shopping.zip), and
+   switch it on. Uploading skills requires a paid plan.
 
-**Use it.** Just ask, for example:
+### Use
 
-- "Find a used Switch OLED on eBay under £200 with free postage."
-- "What do Pyrex 401 bowls actually sell for on eBay?" (uses sold listings)
-- "Find a personalized leather dog collar on Etsy from a highly rated shop."
-- "Is this a good deal? https://www.ebay.co.uk/itm/…"
+- Ask, for example: "Find a used Switch OLED under £200 with free postage."
+  Claude gives a quick first look from web search, plus a filtered eBay
+  link.
+- Open the link, tap **Copy for Claude**, and paste the result into the
+  chat. Claude then compares the real listings.
+- For "is this a good price?", use the sold-listings link, then copy and
+  paste the same way.
 
-**What to expect**
-- **eBay** usually works directly once network egress is on.
-- **Etsy** blocks most automated requests with a bot-check, so Claude often
-  has to use its web search instead. Results are thinner, and you'll always
-  get a filtered Etsy search link you can open yourself.
-- If you'd like Claude to browse Etsy fully, the *Claude in Chrome* extension
-  (paid plans) lets it use your own browser.
-- It's read-only. Claude gives you links, and you buy, bid or message
-  sellers yourself.
+It's read-only. Claude never buys, bids or messages anyone.
 
-**Updating the skill.** When there's a new version of the zip, go to
-Customize → Skills, delete (or switch off) the old `ebay-etsy-shopping`, and
-upload the new zip. Don't rely on "replace": some users report it keeps the
-old files.
+### Developing
 
-To change the skill, edit the files in `skill/ebay-etsy-shopping/`, run
-`sh skill/build.sh` to rebuild the zip, and upload it again. Run the tests
-with `pytest skill/tests`.
+- Skill: edit `skill/ebay-etsy-shopping/`, run `sh skill/build.sh` to
+  rebuild the zip, and run the tests with `pytest skill/tests`.
+- Button: edit `bookmarklet/copy-for-claude.js`. Then, in `bookmarklet/`,
+  run `npm install` once and `npm run build`. The tests run the button in
+  real Chromium against sample pages:
+  `node test/run.mjs && node test/install-page.mjs`. Republish
+  `bookmarklet/install.html` to update the setup page.
 
 ---
 
