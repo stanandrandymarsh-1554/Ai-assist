@@ -1,0 +1,7 @@
+node_modules/
+.env
+.vercel/
+# leftovers from the old branch's local install, not part of this project
+/bookmarklet/
+/desktop-extension/
+/skill/
