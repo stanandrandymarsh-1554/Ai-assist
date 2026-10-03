@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "bulk-shopper",
   "display_name": "Bulk Shopper (eBay UK + Etsy UK)",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lets Claude pull hundreds of eBay UK and Etsy UK listings at once, filtered, with price summaries. Uses your own Chrome. No API keys.",
   "long_description": "Ask Claude to search eBay or Etsy and it reads whole results pages in a Chrome window on your computer: up to 240 eBay listings per page, up to 5 pages per search, including sold prices. It filters them (price, condition, postage, seller feedback, words to exclude), summarises prices (lowest, quartiles, median, highest) and gives a compact table with links, then can open the best listings for postage, returns and details. Because it uses your own browser and connection, eBay and Etsy see a normal visitor. If a site asks you to confirm you're human, do it in the Chrome window and ask again. Read-only: it never buys, bids or messages anyone.",
   "author": { "name": "stanandrandymarsh-1554" },

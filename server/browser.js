@@ -14,6 +14,11 @@ const TABS = 2;
 const CHALLENGE_WAIT_MS = Number(process.env.SHOPPER_CHALLENGE_WAIT_MS ?? 35000);
 const READY = "li.s-item, li.s-card, .x-item-title, [data-listing-id], a[href*='/listing/'], h1";
 const CHALLENGE = /pardon our interruption|captcha-delivery|please enable js and disable any ad blocker|verify you are (a )?human|checking your browser/i;
+// A refusal, not a puzzle: completing a check won't clear it and retrying makes it last longer.
+const REFUSED = /access is temporarily restricted|detected unusual activity from your device/i;
+const COOL_DOWN_MS = 30 * 60 * 1000;
+const refusedUntil = new Map();
+const siteOf = (url) => (/etsy\.com/i.test(new URL(url).hostname) ? "Etsy" : "eBay");
 
 export class Blocked extends Error {}
 
@@ -82,12 +87,27 @@ function giveTab(page) {
   else idle.push(page);
 }
 
-const isChallenge = (page) =>
-  page.evaluate((re) => new RegExp(re, "i").test(document.title + " " + (document.body?.innerText || "").slice(0, 3000) + " " + document.documentElement.innerHTML.slice(0, 20000)), CHALLENGE.source)
+const pageMatches = (page, re) =>
+  page.evaluate((src) => new RegExp(src, "i").test(document.title + " " + (document.body?.innerText || "").slice(0, 3000) + " " + document.documentElement.innerHTML.slice(0, 20000)), re.source)
     .catch(() => false);
+const isChallenge = (page) => pageMatches(page, CHALLENGE);
+
+function refused(site) {
+  refusedUntil.set(site, Date.now() + COOL_DOWN_MS);
+  return new Blocked(
+    `${site} refused this browser ("Access is temporarily restricted"): it recognises that the window is driven by software. ` +
+      `This isn't a check the user can complete, and retrying makes it last longer, so ${site} is paused in this tool for 30 minutes. ` +
+      `Don't retry ${site} now; tell the user, and use the other site or let them search ${site} themselves.`,
+  );
+}
 
 /** Load url in a tab, wait for it to be readable, then run extract(page). Throws Blocked on a human check. */
 export async function visit(url, extract) {
+  const site = siteOf(url);
+  if ((refusedUntil.get(site) ?? 0) > Date.now()) {
+    const mins = Math.ceil((refusedUntil.get(site) - Date.now()) / 60000);
+    throw new Blocked(`${site} refused this browser a few minutes ago ("Access is temporarily restricted"), so it's paused in this tool for another ${mins} min. Don't retry it; use the other site or let the user search ${site} themselves.`);
+  }
   const slot = Math.max(Date.now(), nextSlot);
   nextSlot = slot + MIN_GAP_MS;
   if (slot > Date.now()) await new Promise((r) => setTimeout(r, slot - Date.now()));
@@ -96,11 +116,16 @@ export async function visit(url, extract) {
   try {
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
     await page.waitForSelector(READY, { timeout: 8000 }).catch(() => {});
+    if (await pageMatches(page, REFUSED)) throw refused(site);
     if (await isChallenge(page)) {
       if (HEADLESS) throw new Blocked(`The site showed a "confirm you're human" check, which can't be done with the browser hidden. Turn off "Hide the browser window" in the extension settings and try again.`);
       await page.bringToFront().catch(() => {});
       const until = Date.now() + CHALLENGE_WAIT_MS;
-      while (Date.now() < until && (await isChallenge(page))) await page.waitForTimeout(1500);
+      while (Date.now() < until && (await isChallenge(page))) {
+        if (await pageMatches(page, REFUSED)) throw refused(site);
+        await page.waitForTimeout(1500);
+      }
+      if (await pageMatches(page, REFUSED)) throw refused(site);
       if (await isChallenge(page)) throw new Blocked("The site is asking to confirm you're human in the Chrome window. Please complete it there, then ask again. It usually only asks once.");
       await page.waitForSelector(READY, { timeout: 8000 }).catch(() => {});
     }

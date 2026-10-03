@@ -60,6 +60,7 @@ const routes = {
     body: doc(`<h1 class="x-item-title__mainTitle"><span>Nintendo Switch OLED White 1</span></h1><div class="x-price-primary">£121.00</div>
       <dl class="ux-labels-values"><dt class="ux-labels-values__labels">Returns:</dt><dd class="ux-labels-values__values">30 days returns. Buyer pays for return postage.</dd></dl>`),
   },
+  "https://www.etsy.com/uk/listing/998/restricted": doc("<h1>Etsy</h1><p>Access is temporarily restricted</p><p>We detected unusual activity from your device or network.</p>", "<script src='https://ct.captcha-delivery.com/c.js'></script>"),
   "https://www.etsy.com/uk/listing/999/blocked": doc("<p>Please enable JS and disable any ad blocker</p>", "<script src='https://js.datadome.co/tags.js'></script>"),
 };
 
@@ -148,6 +149,20 @@ test("open_listings reads a listing page even with a strict script policy", asyn
 test("a human check is reported clearly", async () => {
   const { text } = await call("open_listings", { urls: ["https://www.etsy.com/uk/listing/999/blocked"] });
   assert.match(text, /confirm you're human/);
+});
+
+test("a refusal pauses that site instead of waiting or retrying", async () => {
+  const t0 = Date.now();
+  const first = await call("open_listings", { urls: ["https://www.etsy.com/uk/listing/998/restricted"] });
+  assert.match(first.text, /Etsy refused this browser .*paused in this tool for 30 minutes/s);
+  assert.ok(Date.now() - t0 < 2500, "doesn't sit out the human-check wait");
+  const n = loads().length;
+  const again = await call("etsy_search", ETSY_ARGS);
+  assert.equal(again.isError, true);
+  assert.match(again.text, /paused in this tool for another \d+ min/);
+  assert.equal(loads().length, n, "no Etsy page is loaded while paused");
+  const ebay = await call("ebay_search", EBAY_ARGS);
+  assert.equal(ebay.isError, false, "eBay is unaffected");
 });
 
 test("only eBay and Etsy pages can be opened", async () => {
