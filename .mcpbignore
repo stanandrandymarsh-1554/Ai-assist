@@ -1,0 +1,9 @@
+test/
+scripts/
+package-lock.json
+*.md
+*.mcpb
+bookmarklet/
+desktop-extension/
+skill/
+.gitignore

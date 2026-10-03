@@ -1,0 +1,5 @@
+node_modules/
+# leftovers from other branches' local installs, not part of this project
+/bookmarklet/
+/desktop-extension/
+/skill/

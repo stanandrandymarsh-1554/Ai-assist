@@ -1,0 +1,38 @@
+{
+  "manifest_version": "0.2",
+  "name": "bulk-shopper",
+  "display_name": "Bulk Shopper (eBay UK + Etsy UK)",
+  "version": "1.0.0",
+  "description": "Lets Claude pull hundreds of eBay UK and Etsy UK listings at once, filtered, with price summaries. Uses your own Chrome. No API keys.",
+  "long_description": "Ask Claude to search eBay or Etsy and it reads whole results pages in a Chrome window on your computer: up to 240 eBay listings per page, up to 5 pages per search, including sold prices. It filters them (price, condition, postage, seller feedback, words to exclude), summarises prices (lowest, quartiles, median, highest) and gives a compact table with links, then can open the best listings for postage, returns and details. Because it uses your own browser and connection, eBay and Etsy see a normal visitor. If a site asks you to confirm you're human, do it in the Chrome window and ask again. Read-only: it never buys, bids or messages anyone.",
+  "author": { "name": "stanandrandymarsh-1554" },
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": { "SHOPPER_HEADLESS": "${user_config.hide_browser}" }
+    }
+  },
+  "tools": [
+    { "name": "ebay_search", "description": "Bulk search eBay UK (up to 5 pages of 240), including sold prices" },
+    { "name": "etsy_search", "description": "Bulk search Etsy UK" },
+    { "name": "open_listings", "description": "Open up to 8 eBay or Etsy listings for full details" }
+  ],
+  "user_config": {
+    "hide_browser": {
+      "type": "boolean",
+      "title": "Hide the browser window",
+      "description": "Run Chrome invisibly. Leave this off if eBay or Etsy ask you to confirm you're human, because you need the window to do that.",
+      "default": false,
+      "required": false
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "node": ">=18.0.0" }
+  },
+  "keywords": ["ebay", "etsy", "shopping", "uk", "bulk"],
+  "license": "MIT"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "bulk-shopper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Claude Desktop extension: bulk search eBay UK and Etsy UK in your own Chrome, with filters and price summaries. No API keys.",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "pack": "npx -y @anthropic-ai/mcpb@2.1.2 pack . bulk-shopper.mcpb"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.31.0",
+    "playwright-core": "1.56.1",
+    "zod": "^3.25.0"
+  }
+}
